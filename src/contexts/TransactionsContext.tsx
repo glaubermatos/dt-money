@@ -33,11 +33,7 @@ interface TransactionsProviderProps {
 export function TransactionsProvider({ children }: TransactionsProviderProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
 
-  useEffect(() => {
-    fetchTransactions()
-  }, [])
-
-  const fetchTransactions = useCallback( async (query?: string) => {
+  const fetchTransactions = useCallback(async (query?: string) => {
     const response = await api.get('/transactions', {
       params: {
         _sort: 'createdAt',
@@ -48,33 +44,26 @@ export function TransactionsProvider({ children }: TransactionsProviderProps) {
     setTransactions(response.data)
   }, [])
 
-  const createTransaction = useCallback(async (input: CreateTransactionInput) => {
-    const { description, price, category, type } = input
+  const createTransaction = useCallback(
+    async (input: CreateTransactionInput) => {
+      const { description, price, category, type } = input
 
-    const response = await api.post('/transactions', {
-      description,
-      price,
-      category,
-      type,
-      createdAt: new Date(), // quando usamos um backend real não precisamos nos preocupar com essa informação
-    })
+      const response = await api.post('/transactions', {
+        description,
+        price,
+        category,
+        type,
+        createdAt: new Date(), // quando usamos um backend real não precisamos nos preocupar com essa informação
+      })
 
-    setTransactions((state) => [response.data, ...state])
-  }, [])
+      setTransactions((state) => [response.data, ...state])
+    },
+    [],
+  )
 
-  async function createTransactions(input: CreateTransactionInput) {
-    const { description, price, category, type } = input
-
-    const response = await api.post('/transactions', {
-      description,
-      price,
-      category,
-      type,
-      createdAt: new Date(), // quando usamos um backend real não precisamos nos preocupar com essa informação
-    })
-
-    setTransactions((state) => [response.data, ...state])
-  }
+  useEffect(() => {
+    fetchTransactions()
+  }, [fetchTransactions])
 
   return (
     <TransactionsContext.Provider
